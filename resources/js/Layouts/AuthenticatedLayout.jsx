@@ -19,7 +19,7 @@ export default function AuthenticatedLayout({ header, children }) {
                         <div className="flex">
                             <div className="flex shrink-0 items-center">
                                 <Link href="/">
-                                    <ApplicationLogo className="block h-9 w-auto fill-current text-gray-800" />
+                                    <ApplicationLogo className="block h-12 w-auto fill-current text-gray-800" />
                                 </Link>
                             </div>
 
@@ -28,7 +28,19 @@ export default function AuthenticatedLayout({ header, children }) {
                                     href={route('dashboard')}
                                     active={route().current('dashboard')}
                                 >
-                                    Dashboard
+                                    My Profile
+                                </NavLink>
+                                <NavLink
+                                    href={route('manage-counters')}
+                                    active={route().current('manage-counters')}
+                                >
+                                    Manage Counters
+                                </NavLink>
+                                <NavLink
+                                    href={route('statistics')}
+                                    active={route().current('statistics')}
+                                >
+                                    Statistics
                                 </NavLink>
                             </div>
                         </div>

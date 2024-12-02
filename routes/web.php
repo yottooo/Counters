@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -14,9 +15,16 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [UserController::class, 'profile']
+)->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::get('/manage-counters', function () {
+    return Inertia::render('CounterForm');
+})->middleware(['auth', 'verified'])->name('manage-counters');
+
+Route::get('/statistics', function () {
+    return Inertia::render('Statistics');
+})->middleware(['auth', 'verified'])->name('statistics');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

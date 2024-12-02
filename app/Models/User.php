@@ -11,6 +11,7 @@ class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
+    public const MAX_PREGNANCY = 1;
 
     /**
      * The attributes that are mass assignable.
