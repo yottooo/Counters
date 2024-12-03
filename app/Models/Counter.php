@@ -8,6 +8,7 @@ class Counter extends Model
 {
     protected $fillable = [
         'parent_id',
+        'name',
         'type',
         'type_id',
     ];

@@ -14,7 +14,7 @@ class UserController extends Controller
         ]);
     }
 
-    //TODo Gets the counterS associated with this user Id
+    //TODO Gets the counters associated with this user Id
     public function getCounters() {
 
     }

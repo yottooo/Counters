@@ -4,7 +4,7 @@ import NavLink from '@/Components/NavLink';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink';
 import { Link, usePage } from '@inertiajs/react';
 import { useState } from 'react';
-
+import { UserIcon,AdjustmentsHorizontalIcon,CalculatorIcon } from '@heroicons/react/20/solid';
 export default function AuthenticatedLayout({ header, children }) {
     const user = usePage().props.auth.user;
 
@@ -28,18 +28,21 @@ export default function AuthenticatedLayout({ header, children }) {
                                     href={route('dashboard')}
                                     active={route().current('dashboard')}
                                 >
+                                    <UserIcon className="w-5 h-4 mr-2 text-gray-600" />
                                     My Profile
                                 </NavLink>
                                 <NavLink
                                     href={route('manage-counters')}
                                     active={route().current('manage-counters')}
                                 >
+                                    <AdjustmentsHorizontalIcon className="w-5 h-4 mr-2 text-gray-600" />
                                     Manage Counters
                                 </NavLink>
                                 <NavLink
                                     href={route('statistics')}
                                     active={route().current('statistics')}
                                 >
+                                    <CalculatorIcon className="w-5 h-4 mr-2 text-gray-600" />
                                     Statistics
                                 </NavLink>
                             </div>

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Repositories\CounterRepository;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
@@ -12,7 +13,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Bind the repository
+        $this->app->singleton(CounterRepository::class, function ($app) {
+            return new CounterRepository();
+        });
     }
 
     /**

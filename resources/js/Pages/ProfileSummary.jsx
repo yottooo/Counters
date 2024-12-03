@@ -4,13 +4,7 @@ import { Head } from '@inertiajs/react';
 
 export default function ProfileSummary({ user }) {
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    My Profile
-                </h2>
-            }
-        >
+        <AuthenticatedLayout>
             <Head title="Profile" />
 
             <div className="profile-container">

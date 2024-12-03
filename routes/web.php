@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CounterController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Foundation\Application;
@@ -18,9 +19,10 @@ Route::get('/', function () {
 Route::get('/dashboard', [UserController::class, 'profile']
 )->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/manage-counters', function () {
-    return Inertia::render('CounterForm');
-})->middleware(['auth', 'verified'])->name('manage-counters');
+
+Route::get('/manage-counters', [CounterController::class, 'getCountersForManageCounters'])->name('manage-counters');
+
+Route::get('/CounterForm', [CounterController::class, 'counterForm'])->name('counter-form');
 
 Route::get('/statistics', function () {
     return Inertia::render('Statistics');
@@ -30,6 +32,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::post('/storeKid', [CounterController::class, 'storeKid'])->name('storeKid');
+    Route::delete('/counter/{counterId}', [CounterController::class, 'deleteCounter'])->name('counter.delete');
 });
+
 
 require __DIR__.'/auth.php';

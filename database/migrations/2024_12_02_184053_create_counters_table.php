@@ -13,11 +13,12 @@ return new class extends Migration
     {
         Schema::create('counters', function (Blueprint $table) {
             $table->id(); // Primary key
+            $table->string('name'); // Type of the counter (polymorphic relation)
             $table->unsignedBigInteger('parent_id'); // Foreign key for the parent
             $table->string('type'); // Type of the counter (polymorphic relation)
             $table->unsignedBigInteger('type_id'); // ID of the related type
-            $table->timestamps(); // Created_at and updated_at
-            $table->foreign('parent_id')->references('id')->on('parents')->onDelete('cascade');
+            $table->timestamps();
+            $table->foreign('parent_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
