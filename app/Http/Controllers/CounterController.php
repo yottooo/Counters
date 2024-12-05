@@ -7,6 +7,7 @@ use App\Http\Requests\StorePregnancyCounterRequest;
 use App\Models\Counter;
 use App\Models\Kid;
 use App\Repositories\CounterRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
@@ -20,7 +21,7 @@ class CounterController extends Controller
         $this->counterRepository = $counterRepository;
     }
 
-    public function getCountersForManageCounters() {
+    public function getCountersForManageCounters(): \Inertia\Response {
         // Fetch the counters
         $counters = Counter::all();
 
@@ -29,21 +30,26 @@ class CounterController extends Controller
             'counters' => $counters
         ]);
     }
-    public function getCountersForUser($userId) {
 
-    }
 
     public function deleteCounter( $counterId) {
      $this->counterRepository->deleteCounter($counterId);
     }
 
 
-    public function counterForm() {
+    public function counterForm($id=null) {
+        if($id){
+            $item = $this->counterRepository->getCounter($id);
+
+            return Inertia::render('CounterForm', [
+                'item' =>  $item
+            ]);
+        } else{
         return Inertia::render('CounterForm');
+        }
     }
-    //TODO test
-    public function storeKid(StoreKidCounterRequest $request)
-    {
+
+    public function storeKid(StoreKidCounterRequest $request): JsonResponse {
         // The incoming request is valid, so you can retrieve validated data
         $validatedData = $request->validated();
 
@@ -54,8 +60,43 @@ class CounterController extends Controller
             'message' => 'Counter created successfully',
         ]);
     }
+    public function updateKid(StoreKidCounterRequest $request,int $id): JsonResponse
+    {
+        $validatedData = $request->validated();
 
-    //TODO
+        $this->counterRepository->updateKidAndCounter($id, $validatedData);
+        /*TODO when updating check if pregnancy exists for this id
+        and delete form pregnancy and fetuses table for this counter id
+        */
+
+        return response()->json([
+            'message' => 'Counter updated successfully',
+        ], 200);
+    }
+
+
     public function storePregnancy (StorePregnancyCounterRequest $request){
+
+        $validatedData = $request->validated();
+
+        return $this->counterRepository->createPregnancyAndCounter($validatedData);
+
+//        return response()->json([
+//            'message' => 'Counter created successfully',
+//        ]);
+
+    }
+
+    public function updatePregnancy (StorePregnancyCounterRequest $request,int $id){
+
+        $validatedData = $request->validated();
+
+        return $this->counterRepository->updatePregnancyAndCounter($id, $validatedData);
+        /*TODO when updating check if kid exists for this id
+        and delete from kid and fetuses table for this counter id
+        */
+
+
+
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Models\User;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -11,16 +12,17 @@ class StoreKidCounterRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array|string>
      */
     public function rules(): array
     {
+        //Todo add validation for birthday to no more than 25 years in the past from now
         return [
             'counterName' => 'required|string|max:255',
             'type' => 'required|in:kid',
             'kidName' => 'required|string|max:255',
             'gender' => 'required|in:male,female',
-            'birthday' => 'required|date',
+            'birthday' => 'required|date|before:today',
             ];
     }
 

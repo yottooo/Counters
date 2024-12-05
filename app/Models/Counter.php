@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Counter extends Model
 {
@@ -12,4 +13,13 @@ class Counter extends Model
         'type',
         'type_id',
     ];
+
+    public function kid(): HasOne {
+        return $this->hasOne(Kid::class, 'id', 'type_id');
+    }
+
+    public function pregnancy() {
+        return $this->hasOne(Pregnancy::class, 'id', 'type_id');
+    }
+
 }

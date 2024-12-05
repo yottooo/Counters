@@ -12,7 +12,7 @@ export default function ManageCounters({ counters }) {
     //TODO
     const handleEdit = (id) => {
         // Navigate to the Edit page for the specific counter
-        router.get(`/editCounter/${id}`);
+        router.get(`/CounterForm/${id}`);
     };
     //TODO
     const handleDelete = async (id) => {

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('parent_id'); // Foreign key for the parent
             $table->timestamps(); // Created_at and updated_at timestamps
 
-            $table->foreign('parent_id')->references('id')->on('parents')->onDelete('cascade');
+            $table->foreign('parent_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

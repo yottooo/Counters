@@ -13,14 +13,16 @@ class StorePregnancyCounterRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
+    //TODO
     public function rules(): array
     {
         return [
             'counterName' => 'required|string|max:255',
             'type' => 'required|in:pregnancy',
-            'gender' => 'required|in:male,female',
-            'birthday' => 'required|date',
-            ];
+            'dueDate' => 'required|date|after:today|before_or_equal:' . now()->addDays(280)->toDateString(),
+            'kids' => 'nullable|array|min:1',
+            'kids.*.gender' => 'required|in:male,female,unknown',
+        ];
     }
 
     /**
@@ -30,13 +32,14 @@ class StorePregnancyCounterRequest extends FormRequest
      */
     public function messages(): array {
         return [
-            'counterName.required' => 'The counter name field is required.',
-            'type.required' => 'The type field is required.',
-            'type.in' => 'The type must be "kid".',
-            'gender.required_if' => 'The gender field is required when the type is "kid".',
-            'gender.in' => 'The gender must be either male or female.',
-            'birthday.required_if' => 'The birthday field is required when the type is "kid".',
-            'birthday.date' => 'The birthday must be a valid date.',
+            'counterName.required' => 'The counter name is required.',
+            'type.in' => 'The type must be "pregnancy".',
+            'dueDate.required' => 'The due date is required.',
+            'dueDate.after' => 'The due date must be in the future.',
+            'dueDate.before_or_equal' => 'The due date must not be more than 280 days from today.',
+            'kids.*.gender.required' => 'Each kid must have a gender.',
+            'kids.*.gender.in' => 'Gender must be "male", "female", or "unknown".',
+            'kids.min' => 'At least one kid is required for a pregnancy.',
         ];
     }
 }
