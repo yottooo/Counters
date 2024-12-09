@@ -7,6 +7,7 @@ use App\Http\Requests\StorePregnancyCounterRequest;
 use App\Models\Counter;
 use App\Repositories\CounterRepository;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class CounterController extends Controller {
@@ -17,10 +18,8 @@ class CounterController extends Controller {
     }
 
     public function getCountersForManageCounters(): \Inertia\Response {
-        $counters = Counter::all();
-
         return Inertia::render('ManageCounters', [
-            'counters' => $counters
+            'counters' => Counter::where('parent_id', Auth::id())->get()
         ]);
     }
 
