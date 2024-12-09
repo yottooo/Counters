@@ -18,7 +18,7 @@ class Counter extends Model
         return $this->hasOne(Kid::class, 'id', 'type_id');
     }
 
-    public function pregnancy() {
+    public function pregnancy(): HasOne {
         return $this->hasOne(Pregnancy::class, 'id', 'type_id');
     }
 

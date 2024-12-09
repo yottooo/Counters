@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, router } from '@inertiajs/react';
+import {Head, router} from '@inertiajs/react';
 
 export default function ManageCounters({ counters }) {
     const [counterList, setCounterList] = useState(counters);
@@ -9,12 +9,12 @@ export default function ManageCounters({ counters }) {
         // Navigate to the Edit Form page
         router.get('/CounterForm');
     };
-    //TODO
+
     const handleEdit = (id) => {
         // Navigate to the Edit page for the specific counter
         router.get(`/CounterForm/${id}`);
     };
-    //TODO
+
     const handleDelete = async (id) => {
         if (confirm('Are you sure you want to delete this counter?')) {
             try {

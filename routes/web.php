@@ -38,9 +38,11 @@ Route::middleware('auth')->group(function () {
     Route::put('/updatePregnancy/{id}', [CounterController::class, 'updatePregnancy'])->name('updatePregnancy');
     Route::delete('/counter/{counterId}', [CounterController::class, 'deleteCounter'])->name('counter.delete');
 
-    Route::get('/stats', [StatsController::class, 'getAggregatedStats']);
-});
-Route::get('/getCounters', [UserController::class, 'getCounters'])->name('getCounters');
+    Route::get('/stats/aggregated', [StatsController::class, 'getAggregatedStats']);
+    Route::get('/stats/kidsByAge', [StatsController::class, 'getKidsByAgeStats']);
+    Route::get('/stats/pregnancyByMonth', [StatsController::class, 'getPregnancyByMonth']);
 
+    Route::get('/getCounters', [UserController::class, 'getCounters'])->name('getCounters');
+});
 
 require __DIR__.'/auth.php';

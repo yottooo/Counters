@@ -30,7 +30,7 @@ class CounterRepository
             // Start a transaction to ensure both records are created together or neither
             DB::beginTransaction();
 
-            // Create the new kid entry
+
             $kid = Kid::create([
                 'name' => $data['kidName'],
                 'gender' => $data['gender'],
@@ -38,7 +38,7 @@ class CounterRepository
                 'parent_id' => $parentId,
             ]);
 
-            // Create a new entry in the counters table with parent_id, type, and type_id
+
             Counter::create([
                 'name' => $data['counterName'],
                 'parent_id' => $parentId,
@@ -134,27 +134,31 @@ class CounterRepository
                 Pregnancy::where('id', $counter->type_id)->delete();
             }
 
-            // Update the Counter name
-            $counter->update([
-                'name' => $data['counterName'],
-            ]);
-
-            // If the type is 'kid', find the related Kid and update it
-            if ($counter->type === 'kid') {
-                $kid = Kid::findOrFail($counter->type_id);
-                $kid->update([
+            // Create or update the Kid and associate it with the new counter
+            $kid = Kid::updateOrCreate(
+                ['id' => $counter->type_id], // The condition to find the record
+                [
+                    'parent_id' => $parentId,
                     'name' => $data['kidName'],
                     'gender' => $data['gender'],
                     'birthday' => $data['birthday'],
-                ]);
-            }
+                ]
+            );
+
+            // Set the counter's type_id to the kid's ID
+            $counter->update([
+                'name' => $data['counterName'],
+                'type' => $data['type'],  // Assuming 'type' can be 'pregnancy' or 'kid'
+                'type_id' => $kid->id,
+            ]);
+
 
             DB::commit();
             return response()->json(['message' => 'Kid and counter updated successfully'], 200);
 
         } catch (ModelNotFoundException $e) {
             DB::rollBack();
-            return response()->json(['error' => 'Counter or Kid not found'], 404);
+            return response()->json(['error' => 'Counter not found'], 404);
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error updating Kid and Counter: ' . $e->getMessage());
@@ -162,29 +166,40 @@ class CounterRepository
         }
     }
 
+
     public function updatePregnancyAndCounter(int $id, array $data): JsonResponse {
         $parentId = Auth::id();
+        Log::info("Update Request - ID: {$id}, Parent ID: {$parentId}");
 
-        // Start a database transaction
         DB::beginTransaction();
 
         try {
-            // Retrieve the Pregnancy record by its ID
-            $pregnancy = Pregnancy::where('id', $id)
-                ->where('parent_id', $parentId)
-                ->first();
-
-            // Retrieve the Counter record by the same ID (or update if needed)
+            // Retrieve the Counter record by ID and parent_id
             $counter = Counter::where('id', $id)
                 ->where('parent_id', $parentId)
                 ->first();
 
-            // If either record is not found, return an error response
-            if (!$pregnancy || !$counter) {
+            if (!$counter) {
                 return response()->json([
-                    'message' => 'Pregnancy or Counter not found.',
+                    'message' => 'Counter not found.',
                 ], 404);
             }
+
+            Log::info("Counter Record: ", [$counter]);
+
+            // Retrieve Pregnancy using the type_id from Counter
+            $pregnancy = Pregnancy::where('id', $counter->type_id)
+                ->where('parent_id', $parentId)
+                ->first();
+
+            if (!$pregnancy) {
+                $pregnancy = Pregnancy::create([
+                    'termin_date' => $data['dueDate'],
+                    'parent_id' => $parentId,
+                ]);
+            }
+
+            Log::info("Pregnancy Record: ", [$pregnancy]);
 
             // Check if the previous type of Counter was 'kid'
             if ($counter->type === 'kid') {
@@ -192,42 +207,39 @@ class CounterRepository
                 Kid::where('id', $counter->type_id)->delete();
             }
 
-
             // Update the Pregnancy record
             $pregnancy->update([
                 'termin_date' => $data['dueDate'],
             ]);
 
-            // Update the Counter record (the same ID will be used)
+            // Update the Counter record
             $counter->update([
                 'name' => $data['counterName'],
-                'type' => 'pregnancy', // Ensure it's updated to 'pregnancy'
-                'type_id' => $pregnancy->id, // Reference the pregnancy ID
+                'type' => 'pregnancy',
+                'type_id' => $pregnancy->id, // Reference the updated pregnancy ID
             ]);
 
-            // Update the fetuses (kids) in the Fetus table
+            // Delete all existing fetuses (kids) for the pregnancy
+            Fetus::where('pregnancy_id', $pregnancy->id)->delete();
+
+            // Insert the new fetuses
             foreach ($data['kids'] as $kid) {
-                // Update existing fetuses or create new ones if needed
-                Fetus::updateOrCreate(
-                    ['pregnancy_id' => $pregnancy->id, 'gender' => $kid['gender']],
-                    ['gender' => $kid['gender']] // Example of how to update (adjust as needed)
-                );
+                Fetus::create([
+                    'pregnancy_id' => $pregnancy->id,
+                    'gender' => $kid['gender'],
+                ]);
             }
 
-            // Commit the transaction
             DB::commit();
 
-            // Return a success response
             return response()->json([
                 'message' => 'Pregnancy and counter updated successfully.',
                 'counter' => $counter,
             ], 200);
         } catch (\Exception $e) {
-            // Rollback the transaction on error
             DB::rollBack();
-            Log::error('Error updating Pregnancy and Counter: ' . $e->getMessage());
+            Log::error('Update Failed: ' . $e->getMessage());
 
-            // Return an error response
             return response()->json([
                 'message' => 'Failed to update pregnancy and counter.',
                 'error' => $e->getMessage(),
@@ -235,7 +247,7 @@ class CounterRepository
         }
     }
 
-    public function deleteCounter($counterId) {
+    public function deleteCounter($counterId): JsonResponse {
         // Begin a transaction to ensure both deletions happen together
         DB::beginTransaction();
 
@@ -302,7 +314,7 @@ class CounterRepository
                 if ($counter->type === 'kid') {
                     $counter->load('kid');
                 } elseif ($counter->type === 'pregnancy') {
-                    // Load pregnancy and fetuses relationship
+
                     $counter->load('pregnancy.fetuses');
 
                     // Add 'days_left' as an attribute of the pregnancy model

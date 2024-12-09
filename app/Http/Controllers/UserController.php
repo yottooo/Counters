@@ -27,11 +27,8 @@ class UserController extends Controller
         ]);
     }
 
-    //TODO Gets the counters associated with this user Id
     public function getCounters() {
-        $data = $this->counterRepository->getCountersForUser(Auth::id());
-
-        return response()->json($data);
+        return response()->json($this->counterRepository->getCountersForUser(Auth::id()));
     }
 
 }
