@@ -114,8 +114,8 @@ class StatsController extends Controller
     public function getPregnancyByMonth(): JsonResponse
     {
         $pregnanciesByMonth = Pregnancy::select(DB::raw("
-            strftime('%m', termin_date) as month, COUNT(*) as count
-        "))
+        strftime('%m', termin_date) as month, COUNT(*) as count
+    "))
             ->whereBetween('termin_date', [
                 Carbon::now()->startOfMonth(),
                 Carbon::now()->addMonths(9)->endOfMonth()
@@ -125,10 +125,14 @@ class StatsController extends Controller
             ->get()
             ->keyBy('month'); // Key by month for easier merging
 
-        // Full list of months
-        $allMonths = collect(range(1, 12))->mapWithKeys(function ($month) {
+        // Full list of months rotated to start from the current month
+        $currentMonth = Carbon::now()->month;
+
+        $allMonths = collect(range(0, 11))->mapWithKeys(function ($offset) use ($currentMonth) {
+            $month = ($currentMonth + $offset - 1) % 12 + 1; // Ensure it wraps around 12 months
+            $monthKey = str_pad($month, 2, '0', STR_PAD_LEFT);
             return [
-                str_pad($month, 2, '0', STR_PAD_LEFT) => [
+                $monthKey => [
                     'month' => Carbon::createFromFormat('!m', $month)->format('F'),
                     'count' => 0, // Default count is 0
                 ],
