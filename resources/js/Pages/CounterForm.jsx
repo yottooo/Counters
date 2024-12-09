@@ -2,7 +2,6 @@ import { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import axios from 'axios';
-import {Inertia} from "@inertiajs/inertia";
 
 export default function CounterForm({ item = null}) {
     const [type, setType] = useState(item ? item.type : 'pregnancy');
